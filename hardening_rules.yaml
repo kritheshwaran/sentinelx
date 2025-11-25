@@ -1,0 +1,381 @@
+---
+# Linux System Hardening Rules - Annexure B
+# Organization: National Technical Research Organisation
+# Category: Software | Theme: Cyber Security
+
+filesystem:
+  kernel_modules:
+    - id: "1.a.i"
+      name: "cramfs"
+      description: "Ensure cramfs kernel module is not available"
+      check_type: "kernel_module"
+      remediation_type: "blacklist"
+      severity: "medium"
+      automated: true
+      
+    - id: "1.a.ii"
+      name: "freevxfs"
+      description: "Ensure freevxfs kernel module is not available"
+      check_type: "kernel_module"
+      remediation_type: "blacklist"
+      severity: "medium"
+      automated: true
+      
+    - id: "1.a.iii"
+      name: "hfs"
+      description: "Ensure hfs kernel module is not available"
+      check_type: "kernel_module"
+      remediation_type: "blacklist"
+      severity: "medium"
+      automated: true
+      
+    - id: "1.a.iv"
+      name: "hfsplus"
+      description: "Ensure hfsplus kernel module is not available"
+      check_type: "kernel_module"
+      remediation_type: "blacklist"
+      severity: "medium"
+      automated: true
+      
+    - id: "1.a.v"
+      name: "jffs2"
+      description: "Ensure jffs2 kernel module is not available"
+      check_type: "kernel_module"
+      remediation_type: "blacklist"
+      severity: "medium"
+      automated: true
+      
+    - id: "1.a.vi"
+      name: "overlayfs"
+      description: "Ensure overlayfs kernel module is not available"
+      check_type: "kernel_module"
+      remediation_type: "blacklist"
+      severity: "high"
+      automated: true
+      
+    - id: "1.a.vii"
+      name: "squashfs"
+      description: "Ensure squashfs kernel module is not available"
+      check_type: "kernel_module"
+      remediation_type: "blacklist"
+      severity: "medium"
+      automated: true
+      
+    - id: "1.a.viii"
+      name: "udf"
+      description: "Ensure udf kernel module is not available"
+      check_type: "kernel_module"
+      remediation_type: "blacklist"
+      severity: "medium"
+      automated: true
+      
+    - id: "1.a.ix"
+      name: "usb-storage"
+      description: "Ensure usb-storage kernel module is not available"
+      check_type: "kernel_module"
+      remediation_type: "blacklist"
+      severity: "high"
+      automated: true
+
+  partitions:
+    tmp:
+      - id: "1.b.i"
+        name: "tmp_separate"
+        description: "Ensure /tmp is a separate partition"
+        check_type: "partition_exists"
+        mount_point: "/tmp"
+        remediation_type: "manual"
+        severity: "high"
+        automated: false
+        manual_instruction: |
+          Create a separate partition for /tmp:
+          1. Use 'lsblk' to identify available disk space
+          2. Create partition: fdisk /dev/sdX
+          3. Format: mkfs.ext4 /dev/sdXn
+          4. Add to /etc/fstab: /dev/sdXn /tmp ext4 defaults,nodev,nosuid,noexec 0 0
+          5. Mount: mount -a
+          6. Verify: df -h /tmp
+        
+      - id: "1.b.ii"
+        name: "tmp_nodev"
+        description: "Ensure nodev option set on /tmp partition"
+        check_type: "mount_option"
+        mount_point: "/tmp"
+        option: "nodev"
+        remediation_type: "remount"
+        severity: "high"
+        automated: true
+        
+      - id: "1.b.iii"
+        name: "tmp_nosuid"
+        description: "Ensure nosuid option set on /tmp partition"
+        check_type: "mount_option"
+        mount_point: "/tmp"
+        option: "nosuid"
+        remediation_type: "remount"
+        severity: "high"
+        automated: true
+        
+      - id: "1.b.iv"
+        name: "tmp_noexec"
+        description: "Ensure noexec option set on /tmp partition"
+        check_type: "mount_option"
+        mount_point: "/tmp"
+        option: "noexec"
+        remediation_type: "remount"
+        severity: "high"
+        automated: true
+
+    dev_shm:
+      - id: "1.c.i"
+        name: "dev_shm_separate"
+        description: "Ensure /dev/shm is a separate partition"
+        check_type: "partition_exists"
+        mount_point: "/dev/shm"
+        remediation_type: "manual"
+        severity: "high"
+        automated: false
+        manual_instruction: |
+          /dev/shm should be mounted as tmpfs. Add to /etc/fstab:
+          tmpfs /dev/shm tmpfs defaults,nodev,nosuid,noexec 0 0
+          Then: mount -a
+        
+      - id: "1.c.ii"
+        name: "dev_shm_nodev"
+        description: "Ensure nodev option set on /dev/shm partition"
+        check_type: "mount_option"
+        mount_point: "/dev/shm"
+        option: "nodev"
+        remediation_type: "remount"
+        severity: "high"
+        automated: true
+        
+      - id: "1.c.iii"
+        name: "dev_shm_nosuid"
+        description: "Ensure nosuid option set on /dev/shm partition"
+        check_type: "mount_option"
+        mount_point: "/dev/shm"
+        option: "nosuid"
+        remediation_type: "remount"
+        severity: "high"
+        automated: true
+        
+      - id: "1.c.iv"
+        name: "dev_shm_noexec"
+        description: "Ensure noexec option set on /dev/shm partition"
+        check_type: "mount_option"
+        mount_point: "/dev/shm"
+        option: "noexec"
+        remediation_type: "remount"
+        severity: "high"
+        automated: true
+
+    home:
+      - id: "1.d.i"
+        name: "home_separate"
+        description: "Ensure separate partition exists for /home"
+        check_type: "partition_exists"
+        mount_point: "/home"
+        remediation_type: "manual"
+        severity: "medium"
+        automated: false
+        manual_instruction: |
+          Create a separate partition for /home:
+          1. Backup /home data
+          2. Create partition: fdisk /dev/sdX
+          3. Format: mkfs.ext4 /dev/sdXn
+          4. Add to /etc/fstab: /dev/sdXn /home ext4 defaults,nodev,nosuid 0 0
+          5. Restore data and mount
+        
+      - id: "1.d.ii"
+        name: "home_nodev"
+        description: "Ensure nodev option set on /home partition"
+        check_type: "mount_option"
+        mount_point: "/home"
+        option: "nodev"
+        remediation_type: "remount"
+        severity: "medium"
+        automated: true
+        
+      - id: "1.d.iii"
+        name: "home_nosuid"
+        description: "Ensure nosuid option set on /home partition"
+        check_type: "mount_option"
+        mount_point: "/home"
+        option: "nosuid"
+        remediation_type: "remount"
+        severity: "medium"
+        automated: true
+
+    var:
+      - id: "1.e.i"
+        name: "var_separate"
+        description: "Ensure separate partition exists for /var"
+        check_type: "partition_exists"
+        mount_point: "/var"
+        remediation_type: "manual"
+        severity: "high"
+        automated: false
+        manual_instruction: |
+          Create a separate partition for /var:
+          1. Backup /var data
+          2. Create partition and format
+          3. Add to /etc/fstab: /dev/sdXn /var ext4 defaults,nodev,nosuid 0 0
+          4. Restore data and mount
+        
+      - id: "1.e.ii"
+        name: "var_nodev"
+        description: "Ensure nodev option set on /var partition"
+        check_type: "mount_option"
+        mount_point: "/var"
+        option: "nodev"
+        remediation_type: "remount"
+        severity: "high"
+        automated: true
+        
+      - id: "1.e.iii"
+        name: "var_nosuid"
+        description: "Ensure nosuid option set on /var partition"
+        check_type: "mount_option"
+        mount_point: "/var"
+        option: "nosuid"
+        remediation_type: "remount"
+        severity: "high"
+        automated: true
+
+    var_tmp:
+      - id: "1.f.i"
+        name: "var_tmp_separate"
+        description: "Ensure separate partition exists for /var/tmp"
+        check_type: "partition_exists"
+        mount_point: "/var/tmp"
+        remediation_type: "manual"
+        severity: "medium"
+        automated: false
+        manual_instruction: |
+          Create a separate partition for /var/tmp or bind mount from /tmp:
+          Option 1 (bind mount): Add to /etc/fstab:
+          /tmp /var/tmp none bind,nodev,nosuid,noexec 0 0
+          Option 2 (separate partition): Create and mount similar to /tmp
+        
+      - id: "1.f.ii"
+        name: "var_tmp_nodev"
+        description: "Ensure nodev option set on /var/tmp partition"
+        check_type: "mount_option"
+        mount_point: "/var/tmp"
+        option: "nodev"
+        remediation_type: "remount"
+        severity: "medium"
+        automated: true
+        
+      - id: "1.f.iii"
+        name: "var_tmp_nosuid"
+        description: "Ensure nosuid option set on /var/tmp partition"
+        check_type: "mount_option"
+        mount_point: "/var/tmp"
+        option: "nosuid"
+        remediation_type: "remount"
+        severity: "medium"
+        automated: true
+        
+      - id: "1.f.iv"
+        name: "var_tmp_noexec"
+        description: "Ensure noexec option set on /var/tmp partition"
+        check_type: "mount_option"
+        mount_point: "/var/tmp"
+        option: "noexec"
+        remediation_type: "remount"
+        severity: "medium"
+        automated: true
+
+    var_log:
+      - id: "1.g.i"
+        name: "var_log_separate"
+        description: "Ensure separate partition exists for /var/log"
+        check_type: "partition_exists"
+        mount_point: "/var/log"
+        remediation_type: "manual"
+        severity: "high"
+        automated: false
+        manual_instruction: |
+          Create a separate partition for /var/log:
+          1. Backup /var/log data
+          2. Create partition and format
+          3. Add to /etc/fstab: /dev/sdXn /var/log ext4 defaults,nodev,nosuid,noexec 0 0
+          4. Restore data and mount
+        
+      - id: "1.g.ii"
+        name: "var_log_nodev"
+        description: "Ensure nodev option set on /var/log partition"
+        check_type: "mount_option"
+        mount_point: "/var/log"
+        option: "nodev"
+        remediation_type: "remount"
+        severity: "high"
+        automated: true
+        
+      - id: "1.g.iii"
+        name: "var_log_nosuid"
+        description: "Ensure nosuid option set on /var/log partition"
+        check_type: "mount_option"
+        mount_point: "/var/log"
+        option: "nosuid"
+        remediation_type: "remount"
+        severity: "high"
+        automated: true
+        
+      - id: "1.g.iv"
+        name: "var_log_noexec"
+        description: "Ensure noexec option set on /var/log partition"
+        check_type: "mount_option"
+        mount_point: "/var/log"
+        option: "noexec"
+        remediation_type: "remount"
+        severity: "high"
+        automated: true
+
+    var_log_audit:
+      - id: "1.h"
+        name: "var_log_audit_separate"
+        description: "Ensure separate partition exists for /var/log/audit"
+        check_type: "partition_exists"
+        mount_point: "/var/log/audit"
+        remediation_type: "manual"
+        severity: "high"
+        automated: false
+        manual_instruction: |
+          Create a separate partition for /var/log/audit:
+          1. Backup /var/log/audit data
+          2. Create partition and format
+          3. Add to /etc/fstab: /dev/sdXn /var/log/audit ext4 defaults,nodev,nosuid,noexec 0 0
+          4. Restore data and mount
+        
+      - id: "1.h.i"
+        name: "var_log_audit_nodev"
+        description: "Ensure nodev option set on /var/log/audit partition"
+        check_type: "mount_option"
+        mount_point: "/var/log/audit"
+        option: "nodev"
+        remediation_type: "remount"
+        severity: "high"
+        automated: true
+        
+      - id: "1.h.ii"
+        name: "var_log_audit_nosuid"
+        description: "Ensure nosuid option set on /var/log/audit partition"
+        check_type: "mount_option"
+        mount_point: "/var/log/audit"
+        option: "nosuid"
+        remediation_type: "remount"
+        severity: "high"
+        automated: true
+        
+      - id: "1.h.iii"
+        name: "var_log_audit_noexec"
+        description: "Ensure noexec option set on /var/log/audit partition"
+        check_type: "mount_option"
+        mount_point: "/var/log/audit"
+        option: "noexec"
+        remediation_type: "remount"
+        severity: "high"
+        automated: true
